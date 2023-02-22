@@ -1,3 +1,5 @@
+package clases;
+
 public class Nodo{
     
     public Integer numProceso;
