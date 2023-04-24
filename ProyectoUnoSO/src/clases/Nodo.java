@@ -32,6 +32,8 @@ public class Nodo{
 
     @Override
     public String toString(){
-        return "["+"Numero de Proceso: "+numProceso+" Nombre del proceso: "+nomProceso+" Tamaño del proceso: "+tamaño+" Tiempo del proceso: "+tiempo+"]------>";
+        String cadenaNodo = String.format("%-16s %-20s %-10s %-11s", numProceso, nomProceso, tamaño, tiempo);
+        
+        return cadenaNodo;
     }
 }
