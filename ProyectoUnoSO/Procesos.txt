@@ -1,0 +1,12 @@
+
+<------ Procesos ------>
+Lista ordenada por: sin orden
+Numero proceso   Nombre proceso       Tamaño     Tiempo     Tiempo entrada   Tiempo salida   
+
+<------ Procesos ------>
+Lista ordenada por: sin orden
+Numero proceso   Nombre proceso       Tamaño     Tiempo     Tiempo entrada   Tiempo salida   
+
+<------ Procesos ------>
+Lista ordenada por: sin orden
+Numero proceso   Nombre proceso       Tamaño     Tiempo     Tiempo entrada   Tiempo salida   

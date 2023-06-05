@@ -1,6 +1,10 @@
 package main;
 
 import clases.Nodo;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,8 +15,8 @@ public class ProyectoUno {
         //Creamos la lista con la clase nodo.
         List<Nodo> list = new ArrayList<>();
         int numProceso, tamaño, tiempo, separacion;
-        int matriz[][];
         String opcion = null;
+        boolean rehusar = false;
         String nomProceso = null;
         String orden = "sin orden";
         //Este blucle sera el encargado de mostrar nuesto menu.
@@ -23,7 +27,9 @@ public class ProyectoUno {
                                 + "\n2. Ordenar lista por tamaño."
                                 + "\n3. Ordenar lista por tiempo."
                                 + "\n4. Ordenar lista por numero de proceso."
-                                + "\n5. Mostrar lista."+"\n6. Salir",
+                                + "\n5. Mostrar lista."
+                                + "\n6. Imprimir listas en archivo"
+                                + "\n7. Salir",
                         "Menu de opciones",1);
                 
                 switch(opcion){
@@ -52,26 +58,20 @@ public class ProyectoUno {
                         orden = "número de proceso";
                         break;
                     case "5":
-                        System.out.println("");
-                        System.out.println("<------ Procesos ------>");
-                        System.out.println("Lista ordenada por: "+ orden );
-                        System.out.println(String.format("%-16s %-20s %-10s %-10s %-16s %-16s %-16s", "Numero proceso", "Nombre proceso", "Tamaño", "Tiempo", "Tiempo entrada", "Tiempo salida", "Tiempo en el sistema"));
                         
-                        matriz = concatenar(list);
-                        
-                        int columna = 0;
-                        for (Nodo nodo : list) {
-                            System.out.print(nodo.toString());
-                            System.out.print(String.format("%-16s %-16s %-16s", matriz[0][columna], matriz[1][columna], matriz[2][columna]));
-                            columna++;
-                            System.out.println("");
-                        }
-                        
-                        System.out.println("");
-                        
+                        System.out.println(retornarImpresion(orden, list));
                         
                         break;
                     case "6":
+                        
+                        String imprimir = retornarImpresion(orden, list);
+                        
+                        imprimirArchivo(imprimir, rehusar);
+                        
+                        rehusar = true;
+                        
+                        break;
+                    case "7":
                         break;
                     default:
                         JOptionPane.showMessageDialog(null, "Opción incorrecta");
@@ -83,39 +83,67 @@ public class ProyectoUno {
                 }
                 else
                 {
-                    opcion = "6";
+                    opcion = "7";
                 }
             }
-        }while(opcion!="6");
+        }while(opcion!="7");
     }
     
     
     public static int[][] concatenar(List<Nodo> list){
-        int fila, columna;
+        int fila, columna, contador = 0, contadorTiempo = 0, index, tiempoMenor;
         Nodo[] arrayNodos = listaArray(list);
-        int[][] matriz = new int[3][list.size()];
+        int[][] matriz = new int[2][list.size()];
+        int[] tiempos = new int[3];
         
-        for(columna = 0; columna<matriz[0].length; columna++){
-            for(fila = 0; fila<matriz.length; fila++){
-                switch(fila){
+        for(fila = 0; fila<matriz[0].length; fila++){
+            for(columna = 0; columna<matriz.length; columna++){
+                
+                
+                
+                switch(columna){
                     case 0: 
-                        if(columna == 0)
-                            matriz[0][0] = 0;
+                        if(fila < 3){
+                            matriz[columna][fila] = 0;
+                        }
                         else
-                            matriz[fila][columna] = matriz[fila+1][columna-1];
+                        {
+                                                     
+                            contadorTiempo+= tiempos[menorNumero(tiempos)];
+                            tiempoMenor = tiempos[menorNumero(tiempos)];
+                            index = menorNumero(tiempos);
+                            
+                            matriz[columna][fila] = contadorTiempo;
+                            
+                            for(int i = 0; i<tiempos.length; i++){
+                                tiempos[i] = tiempos[i] - tiempoMenor;
+                            }
+                            
+                            tiempos[index] = arrayNodos[fila].tiempo;
+                            
+                        }    
+                            
                         break;
                     case 1:
-                        if(columna == 0)
-                            matriz[1][0] = arrayNodos[columna].tiempo;
+                        if(fila < 3){
+                            matriz[columna][fila] = arrayNodos[fila].tiempo;
+                            tiempos[fila] = matriz[columna][fila];
+                        }
                         else
-                            matriz[fila][columna] = matriz[fila][columna-1] + arrayNodos[columna].tiempo;
+                            matriz[columna][fila] = matriz[columna-1][fila] + arrayNodos[fila].tiempo;
                         break;
-                    case 2:
-                        matriz[fila][columna] = matriz[fila-1][columna];
                 }
                     
                         
             }
+            
+//            if(fila >= 3){
+//                
+//                for(int i = 0; i<tiempos.length; i++){
+//                    tiempos[i] = tiempos[i] - arrayNodos[fila].tiempo;
+//                }
+//            }
+            
         }
         
         return matriz;
@@ -131,5 +159,68 @@ public class ProyectoUno {
         }
         
         return arrayNodos;
+    }
+    
+    public static int menorNumero(int[] arreglo){
+        int menor = arreglo[0];
+        int index = 0, contador = 0;
+        
+        for(int i = 0; i<arreglo.length-1; i++){
+            if(menor > arreglo[i+1]){
+                menor = arreglo[i+1];
+                index = contador+1;
+            }
+            contador++;
+        }
+        
+        return index;
+    }
+    
+    public static String retornarImpresion(String orden, List<Nodo> list) {
+        
+        int matriz[][];
+
+        String impresion;
+        
+        impresion = "";
+        impresion+= "\n<------ Procesos ------>";
+        impresion+= "\nLista ordenada por: " + orden;
+        impresion+= "\n" + String.format("%-16s %-20s %-10s %-10s %-16s %-16s", "Numero proceso", "Nombre proceso", "Tamaño", "Tiempo", "Tiempo entrada", "Tiempo salida");
+
+        matriz = concatenar(list); //Concatena todos los datos en una sola matriz y regresa una matriz
+
+        int columna = 0;
+        for (Nodo nodo : list) {
+            impresion+= "\n" + nodo.toString();
+            impresion+= String.format("%-16s %-16s", matriz[0][columna], matriz[1][columna]);
+            columna++;
+            impresion+= "";
+        }
+
+        impresion+= "";
+        
+        
+        return impresion;
+    }
+    
+    public static void imprimirArchivo(String impresion, boolean rehusar){
+        BufferedWriter bw = null;
+		try {
+			File fichero = new File("Procesos.txt");
+
+			System.out.println("Archivo impreso en:\n" + fichero.getCanonicalPath()); // Path completo donde se creará el fichero.
+                        System.out.println("");
+                        
+			bw = new BufferedWriter(new FileWriter("Procesos.txt", rehusar));
+			bw.write(impresion);
+                        bw.write("\n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				bw.close(); // Cerramos el buffer
+			} catch (Exception e) {
+			}
+		}
     }
 }
